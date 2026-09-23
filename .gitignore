@@ -1,0 +1,39 @@
+# Quarto
+.quarto/
+_site/
+build/_staging/
+
+# Build outputs (keep folders via .gitkeep)
+build/pdf/*
+build/html/*
+build/docx/*
+build/audio/*
+!build/**/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+~$*.xlsx
+*.xlsx.lock
+
+# Audio intermediates
+*.wav
+*.mp3
+!build/audio/**/*.mp3
+!Deployment/audio/**/*.mp3
+
+/.quarto/
+**/*.quarto_ipynb

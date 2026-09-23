@@ -1,0 +1,16 @@
+---
+title: "New Engineering Datasheet"
+author: "SKLL Embedded Systems Team"
+date: today
+format:
+  typst:
+    toc: true
+    number-sections: true
+  html: default
+  docx: default
+bibliography: ../../resources/bibliography/references.bib
+---
+
+# Overview {#sec-overview}
+
+Replace this text with the purpose, interfaces, and key constraints of the component.

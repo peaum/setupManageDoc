@@ -1,0 +1,3 @@
+[console_scripts]
+skll-build-audio = scripts.audio.build_audio:main
+skll-post-render = scripts.build.post_render:main

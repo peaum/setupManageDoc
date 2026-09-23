@@ -1,0 +1,32 @@
+meta:
+  name: SKLL-ENGMATH
+  link: https://example.com
+
+color:
+  palette:
+    primary: "#003366"
+    secondary: "#C8102E"
+    accent: "#F2A900"
+    neutral: "#4A4A4A"
+  foreground: neutral
+  background: "#FFFFFF"
+  primary: primary
+  secondary: secondary
+
+typography:
+  base:
+    family: "Libertinus Serif"
+    size: 11pt
+  headings:
+    family: "Libertinus Sans"
+    color: primary
+  monospace:
+    family: "DejaVu Sans Mono"
+
+logo:
+  images:
+    logo:
+      path: logo.svg
+      alt: "SKLL-ENGMATH logo"
+  small: logo
+  medium: logo

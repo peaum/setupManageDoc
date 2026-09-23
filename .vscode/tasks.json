@@ -1,0 +1,170 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+        "label": "render:pdf",
+        "dependsOn": [
+            "render:pdf:quarto",
+            "render:pdf:copy"
+        ],
+        "dependsOrder": "sequence",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        }
+    },
+    {
+        "label": "render:html",
+        "dependsOn": [
+            "render:html:quarto",
+            "render:html:copy"
+        ],
+        "dependsOrder": "sequence",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "render:docx",
+        "dependsOn": [
+            "render:docx:quarto",
+            "render:docx:copy"
+        ],
+        "dependsOrder": "sequence",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "render:pdf:quarto",
+        "type": "process",
+        "command": "quarto",
+        "args": ["render", "${file}", "--to", "typst"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:pdf:copy",
+        "type": "process",
+        "command": "python",
+        "args": ["scripts/build/post_render.py", "pdf", "--source", "${file}"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:html:quarto",
+        "type": "process",
+        "command": "quarto",
+        "args": ["render", "${file}", "--to", "html"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:html:copy",
+        "type": "process",
+        "command": "python",
+        "args": ["scripts/build/post_render.py", "html", "--source", "${file}"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:docx:quarto",
+        "type": "process",
+        "command": "quarto",
+        "args": ["render", "${file}", "--to", "docx"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:docx:copy",
+        "type": "process",
+        "command": "python",
+        "args": ["scripts/build/post_render.py", "docx", "--source", "${file}"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "hide": true
+    },
+    {
+        "label": "render:audio",
+        "type": "process",
+        "command": "python",
+        "args": ["scripts/audio/build_audio.py", "from-qmd", "${file}"],
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": [],
+        "group": {
+            "kind": "build",
+            "isDefault": false
+        }
+    },
+    {
+        "label": "render:all",
+        "dependsOn": [
+            "render:pdf",
+            "render:html",
+            "render:docx",
+            "render:audio"
+        ],
+        "dependsOrder": "parallel",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "clean:staging",
+        "type": "shell",
+        "command": "python scripts/build/cleanup.py",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": []
+    },
+    {
+        "label": "clean:all",
+        "type": "shell",
+        "command": "python scripts/build/cleanup.py --all",
+        "presentation": {
+            "reveal": "always",
+            "panel": "shared"
+        },
+        "problemMatcher": []
+    }
+]
+}

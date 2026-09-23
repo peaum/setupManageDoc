@@ -1,0 +1,38 @@
+project:
+  type: default
+  output-dir: build/_staging
+  render:
+    - src/quarto/**/*.qmd
+  resources:
+    - assets/
+    - css/
+    - javascript/
+  post-render: python scripts/build/post_render.py auto
+
+format:
+  typst:
+    keep-typ: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-location: margin
+    citation-location: margin
+  html:
+    embed-resources: true
+    toc: true
+    number-sections: true
+    css: ../../css/custom.css
+    include-in-header:
+      - text: |
+          <script src="../../javascript/custom.js"></script>
+  docx:
+    toc: true
+    number-sections: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+
+bibliography: resources/bibliography/references.bib
+brand: resources/brand/_brand.yml

@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skll-engmath"
+version = "0.1.0"
+description = "Embedded systems datasheets, reports, and technical references."
+requires-python = ">=3.11"
+dependencies = [
+  "beautifulsoup4>=4.12",
+  "tabulate>=0.9",
+  "pandas>=2.0",
+  "openpyxl>=3.1",
+  "matplotlib>=3.7",
+  "pyyaml>=6.0",
+  "rich>=13.0",
+  "typer>=0.9",
+  "piper-tts>=1.2",
+  "pydub>=0.25",
+  "audioop-lts>=0.2; python_version >= '3.13'",
+  "imageio-ffmpeg>=0.6",
+  "soundfile>=0.12",
+  "jupyter>=1.0",
+  "ipykernel>=6.0",
+]
+  [project.optional-dependencies]
+  test = ["pytest>=8.0"]
+
+[project.scripts]
+skll-build-audio = "scripts.audio.build_audio:main"
+skll-post-render = "scripts.build.post_render:main"
+
+[tool.setuptools.packages.find]
+include = ["scripts*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

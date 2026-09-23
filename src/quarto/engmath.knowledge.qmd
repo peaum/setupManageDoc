@@ -1,0 +1,75 @@
+---
+title: "Embedded Controller Engineering Reference"
+author: "SKLL Embedded Systems Team"
+date: today
+format:
+  typst:
+    keep-typ: true
+    toc: true
+    number-sections: true
+  html: default
+  docx: default
+bibliography: ../../resources/bibliography/references.bib
+jupyter: python3
+---
+
+# Device Overview {#sec-overview}
+
+This reference documents a compact controller and its register-level interface. The architecture follows the conventions described by @arm2020cortexm.
+
+::: {.audio-chunk #s1.1p1}
+This section introduces the embedded controller engineering reference and its register-level interface.
+:::
+
+## Pin Definitions {#sec-pins}
+
+| Pin | Name | Direction | Description |
+|:---:|:-----|:---------:|:------------|
+| 1 | VDD | Power | 3.3 volt supply |
+| 2 | GND | Power | Ground return |
+| 3 | PA0 | I/O | General-purpose input/output |
+| 4 | UART_TX | Output | Serial transmit line |
+
+Table: Controller pin definitions. {#tbl-pinout}
+
+::: {.callout-note}
+The GPIO bank is reset to a safe input state after power-on.
+:::
+
+## Register Map {#sec-registers}
+
+The generated map in @tbl-registers complements the pin assignment in @tbl-pinout.
+
+```{python}
+#| label: tbl-registers
+#| tbl-cap: "Controller register map"
+from IPython.display import Markdown, display
+from tabulate import tabulate
+
+registers = [["CTRL", "0x00", "Enable and mode"], ["STATUS", "0x04", "Ready flags"]]
+display(Markdown(tabulate(registers, headers=["Register", "Offset", "Purpose"], tablefmt="pipe")))
+```
+
+::: {.callout-warning}
+Writes to reserved register bits must use zero values to preserve forward compatibility.
+:::
+
+## Timing Characteristic {#sec-timing}
+
+The representative response curve is shown in @fig-response.
+
+```{python}
+#| label: fig-response
+#| fig-cap: "Representative controller response"
+import matplotlib.pyplot as plt
+
+sample_times = [0, 1, 2, 3, 4]
+sample_response = [0.0, 0.35, 0.62, 0.82, 0.93]
+plt.plot(sample_times, sample_response, marker="o")
+plt.xlabel("Time (ms)")
+plt.ylabel("Normalized response")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+```
+
+The timing profile is illustrative and should be replaced with measured data before release.

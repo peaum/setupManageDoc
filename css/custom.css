@@ -1,0 +1,14 @@
+/* Project-wide HTML customizations. */
+:root {
+  --skll-primary: #003366;
+  --skll-secondary: #c8102e;
+  --skll-accent: #f2a900;
+}
+
+.quarto-title-block h1 {
+  color: var(--skll-primary);
+}
+
+a {
+  color: var(--skll-secondary);
+}

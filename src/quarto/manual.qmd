@@ -1,0 +1,453 @@
+---
+title: "SKLL-ENGMATH Project Manual"
+author: "SKLL Embedded Systems Team"
+date: today
+format:
+  typst:
+    keep-typ: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  docx:
+    toc: true
+    number-sections: true
+bibliography: ../../resources/bibliography/references.bib
+---
+
+# Purpose
+
+SKLL-ENGMATH is a documentation and build project for embedded systems datasheets, engineering reports, and technical references. Source documents are written in Quarto Markdown (`.qmd`) and can be rendered to PDF through Typst, HTML, or DOCX. Selected sections can also be converted into spoken audio with Piper TTS.
+
+This manual explains how to install the project, create documents, render outputs, add HTML customizations, build audio, run tests, and troubleshoot common problems.
+
+::: {.callout-note}
+Run project commands from the repository root:
+
+```text
+C:\Users\peace\Documents\TUS\Digital Communications\digcom
+```
+:::
+
+# Requirements
+
+The project requires the following software:
+
+- Quarto 1.9 or newer.
+- Python 3.11 or newer. Python 3.14 is supported with the compatibility dependencies in `requirements.txt`.
+- Typst, normally bundled with Quarto.
+- A Piper voice model for audio generation.
+- Visual Studio Code is recommended because the project includes ready-to-run tasks.
+
+Check the command-line tools with:
+
+```powershell
+quarto --version
+python --version
+```
+
+Install Quarto from <https://quarto.org/docs/get-started/>.
+
+# Installation
+
+Create and activate a virtual environment if the project is not using the system interpreter:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+Install the project dependencies:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+The dependencies include Quarto's Python notebook runtime, document-processing libraries, Rich logging, Typer command-line tools, Piper TTS, audio conversion support, and pytest.
+
+## Piper voice model
+
+Download the default voice model into `data/raw/`:
+
+```powershell
+python -m piper.download_voices en_US-lessac-medium --data-dir data/raw
+```
+
+The expected files are:
+
+```text
+data/raw/en_US-lessac-medium.onnx
+data/raw/en_US-lessac-medium.onnx.json
+```
+
+The model is not stored in the source repository because it is a large binary asset. The audio scripts look for it automatically when the voice is `en_US-lessac-medium`.
+
+# Project Structure
+
+The important directories are:
+
+```text
+SKLL-ENGMATH/
+├── .vscode/tasks.json             VS Code render and cleanup tasks
+├── assets/                        Images and fonts used by documents
+├── build/
+│   ├── _staging/                  Temporary Quarto output
+│   ├── pdf/                       Final PDF files
+│   ├── html/                      Final HTML documents
+│   ├── docx/                      Final DOCX files
+│   └── audio/                     Standard generated audio output
+├── content/                       Optional reusable content
+├── data/
+│   ├── raw/                       Voice models and source data
+│   └── processed/                 Transformed data
+├── css/custom.css                 HTML-only style customizations
+├── javascript/custom.js           HTML-only JavaScript customizations
+├── resources/
+│   ├── brand/                     Brand colors, fonts, and logo
+│   ├── bibliography/              BibTeX references
+│   └── templates/                 Optional document templates
+├── scripts/
+│   ├── audio/                     Audio extraction and synthesis
+│   ├── build/                     Render post-processing and cleanup
+│   └── utils/                     Shared paths and logging
+├── src/quarto/                    Quarto source documents
+├── tests/                         Automated tests
+├── _quarto.yml                    Project-wide Quarto configuration
+├── pyproject.toml                 Python package metadata
+└── requirements.txt               Flat Python dependency list
+```
+
+Quarto writes intermediate files to `build/_staging/`. Final outputs are copied into stable format-specific directories by the post-render hook or VS Code tasks.
+
+# Creating Documents
+
+## Start from the skeleton
+
+Copy `src/quarto/skeleton.qmd` to create a new document:
+
+```powershell
+Copy-Item src/quarto/skeleton.qmd src/quarto/new_datasheet.qmd
+```
+
+Edit the title, author, date, sections, tables, figures, and references. Keep source documents in `src/quarto/` so the project render configuration can find them.
+
+A minimal document looks like this:
+
+```markdown
+---
+title: "New Engineering Datasheet"
+author: "SKLL Embedded Systems Team"
+date: today
+format: html
+---
+
+# Overview
+
+Describe the component, system, or engineering topic here.
+```
+
+## Tables
+
+Use ordinary Markdown tables for stable, manually maintained data:
+
+```markdown
+| Pin | Name | Direction | Description |
+|:---:|:-----|:---------:|:------------|
+| 1 | VDD | Power | Supply input |
+| 2 | GND | Power | Ground return |
+```
+
+Add a table label when you need a cross-reference:
+
+```markdown
+Table: Pin definitions. {#tbl-pinout}
+```
+
+Refer to it in prose with `@tbl-pinout`.
+
+## Python code blocks
+
+Python chunks can generate tables and figures. The project uses the Python Jupyter kernel:
+
+````markdown
+```{python}
+#| label: fig-response
+#| fig-cap: "Measured response"
+import matplotlib.pyplot as plt
+
+x_values = [0, 1, 2, 3]
+y_values = [0.0, 0.4, 0.7, 0.9]
+plt.plot(x_values, y_values, marker="o")
+plt.xlabel("Time")
+plt.ylabel("Response")
+plt.grid(True, alpha=0.3)
+```
+````
+
+Make sure the Python packages used by a document are declared in `requirements.txt`.
+
+## Callouts
+
+Use callouts to distinguish notes, warnings, and important engineering constraints:
+
+```markdown
+::: {.callout-note}
+This is explanatory information.
+:::
+
+::: {.callout-warning}
+This condition requires special care during implementation.
+:::
+```
+
+# Rendering Documents
+
+## VS Code tasks
+
+Open the QMD file you want to render and use **Terminal > Run Task**. The main tasks are:
+
+| Task | Result |
+|:-----|:-------|
+| `render:pdf` | Renders Typst PDF and copies it to `build/pdf/` |
+| `render:html` | Renders HTML and copies it to `build/html/<stem>/index.html` |
+| `render:docx` | Renders DOCX and copies it to `build/docx/` |
+| `render:audio` | Builds audio from QMD audio chunks |
+| `render:all` | Runs PDF, HTML, DOCX, and audio tasks |
+| `clean:staging` | Removes temporary staging output |
+| `clean:all` | Removes all generated output while preserving `.gitkeep` files |
+
+`render:pdf` is the default build task, so `Ctrl+Shift+B` runs the PDF pipeline for the active QMD file.
+
+## PowerShell commands
+
+Run these commands from the project root when you prefer the terminal:
+
+```powershell
+quarto render src/quarto/engmath.knowledge.qmd --to typst
+quarto render src/quarto/engmath.knowledge.qmd --to html
+quarto render src/quarto/engmath.knowledge.qmd --to docx
+```
+
+The project-level `post-render` hook copies HTML to `build/html/<stem>/index.html` and removes temporary `.typ` and resource artifacts beside the source QMD. The hook also runs during direct Quarto rendering, not only from VS Code tasks.
+
+## Output locations
+
+For `engmath.knowledge.qmd`, the final files are:
+
+```text
+build/pdf/engmath.knowledge.pdf
+build/html/engmath.knowledge/index.html
+build/docx/engmath.knowledge.docx
+```
+
+The HTML output is self-contained where possible because `embed-resources: true` is enabled.
+
+# HTML Customization
+
+HTML-specific assets live in:
+
+```text
+css/custom.css
+javascript/custom.js
+```
+
+Edit `css/custom.css` to change colors, spacing, typography, tables, callouts, or other HTML presentation details. Edit `javascript/custom.js` to add browser behavior such as navigation helpers, interactive controls, or document instrumentation.
+
+These assets are configured only for the HTML format. PDF and DOCX rendering do not execute the JavaScript or apply the HTML stylesheet.
+
+The current JavaScript adds the `skll-engmath-html` class to the document root. That class can be used as a scope for future styles:
+
+```css
+.skll-engmath-html .callout {
+  border-radius: 0;
+}
+```
+
+Keep customizations small and test the HTML output after changing them.
+
+# Audio Workflow
+
+## Mark audio sections
+
+Add a Pandoc fenced div to any QMD document:
+
+```markdown
+::: {.audio-chunk #s1.1p1}
+This paragraph will be converted into spoken audio.
+:::
+```
+
+The identifier becomes the output filename. Use unique identifiers within a document. Identifiers such as `s1.1p1` and `random-01` are both valid.
+
+The parser supports source QMD files and rendered HTML. QMD extraction is useful when you want to build audio without first rendering the document. HTML extraction is useful when you want the spoken text to match the post-rendered document.
+
+## Build audio in the standard directory
+
+Build per-chunk MP3 files into `build/audio/`:
+
+```powershell
+python scripts/audio/build_audio.py from-qmd src/quarto/audio_test.qmd
+```
+
+The output is:
+
+```text
+build/audio/audio_test/random-01.mp3
+build/audio/audio_test/random-02.mp3
+```
+
+Create one combined file:
+
+```powershell
+python scripts/audio/build_audio.py concat audio_test
+```
+
+This creates:
+
+```text
+build/audio/audio_test/full.mp3
+```
+
+## Build audio for deployment
+
+Use `--output-dir` to place the generated files in a deployment directory:
+
+```powershell
+python scripts/audio/build_audio.py from-qmd `
+  src/quarto/audio_test.qmd `
+  --voice en_US-lessac-medium `
+  --output-dir Deployment/audio
+
+python scripts/audio/build_audio.py concat audio_test `
+  --output-dir Deployment/audio
+```
+
+The deployment output is:
+
+```text
+Deployment/audio/audio_test/full.mp3
+Deployment/audio/audio_test/random-01.mp3
+```
+
+The output directory is optional. Without it, audio defaults to `build/audio`.
+
+## Audio implementation details
+
+The pipeline performs these steps:
+
+1. `extract_audio_chunks.py` reads the QMD or HTML and returns `(identifier, text)` pairs.
+2. `tts_engine.py` loads the Piper voice model and creates temporary WAV data.
+3. `soundfile` normalizes the WAV output.
+4. `imageio-ffmpeg` supplies an FFmpeg binary for MP3 conversion.
+5. The final MP3 is written to the selected output directory.
+6. The `concat` command combines chunk files using FFmpeg's concat demuxer.
+
+# Tests
+
+Run the focused audio test with:
+
+```powershell
+python -m pytest tests/test_audio_build.py -q
+```
+
+The test uses a fake synthesizer and a temporary directory. It verifies extraction, chunk ordering, file naming, and output-directory behavior without requiring a voice model. The real audio test requires the Piper model and creates persistent MP3 files.
+
+Run the complete test suite with:
+
+```powershell
+python -m pytest -q
+```
+
+# Cleaning Generated Files
+
+Remove only Quarto staging output:
+
+```powershell
+python scripts/build/cleanup.py
+```
+
+Remove staging, PDF, HTML, DOCX, and standard audio outputs:
+
+```powershell
+python scripts/build/cleanup.py --all
+```
+
+The cleanup command preserves `.gitkeep` files. It does not remove deployment audio under `Deployment/audio`; remove deployment artifacts separately when they are no longer needed.
+
+# Troubleshooting
+
+## `&&` is not a valid PowerShell separator
+
+The project tasks use process-based task definitions instead of `&&`. If a custom task still contains `&&`, replace it with separate dependent tasks or PowerShell conditional execution.
+
+## Quarto reports no valid input files
+
+Confirm that the active editor file is a `.qmd` file inside the workspace and that it exists on disk:
+
+```powershell
+Test-Path src/quarto/engmath.knowledge.qmd
+```
+
+Run the command from the repository root rather than from `src/quarto`.
+
+## Python chunks fail during Quarto rendering
+
+Install the project dependencies and ensure Quarto is using the same Python interpreter:
+
+```powershell
+python -m pip install -r requirements.txt
+python -c "import yaml, jupyter, ipykernel; print('Python runtime ready')"
+```
+
+## Piper reports a missing voice model
+
+Check that both model files are in `data/raw/`:
+
+```powershell
+Get-ChildItem data/raw/en_US-lessac-medium*
+```
+
+Download them again if necessary:
+
+```powershell
+python -m piper.download_voices en_US-lessac-medium --data-dir data/raw
+```
+
+## MP3 conversion fails
+
+The project uses `imageio-ffmpeg` so a system FFmpeg installation is normally unnecessary. Restore dependencies if the bundled converter is missing:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+On Python 3.13 or newer, `audioop-lts` is also required for pydub compatibility and is declared conditionally in the dependency files.
+
+## Output appears in the wrong directory
+
+Use the audio command's explicit output option:
+
+```powershell
+python scripts/audio/build_audio.py from-qmd src/quarto/audio_test.qmd --output-dir Deployment/audio
+```
+
+Remember that the default audio destination is `build/audio`, while deployment audio uses `Deployment/audio` only when that option is supplied.
+
+# Recommended Workflow
+
+For a new engineering document:
+
+1. Copy `src/quarto/skeleton.qmd` to a descriptive filename.
+2. Add frontmatter, sections, tables, figures, citations, and callouts.
+3. Add audio markers only to text that should be spoken.
+4. Run the focused document render, usually `render:pdf` or `render:html`.
+5. Review the output in the appropriate `build/` directory.
+6. Run `render:audio` after installing the Piper voice model.
+7. Run `python -m pytest -q` before sharing changes.
+8. Copy or build final audio into `Deployment/audio` when preparing a deployment package.
+9. Keep source files in `src/quarto/` and avoid committing temporary staging artifacts.
+
+This workflow keeps source documents, generated build products, and deployment artifacts separate and reproducible.

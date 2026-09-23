@@ -1,0 +1,30 @@
+---
+title: "Audio Random Words Test"
+author: "SKLL Embedded Systems Team"
+date: today
+format: html
+---
+
+# Audio Test
+
+This document contains short random-word phrases for checking the Piper audio pipeline.
+
+::: {.audio-chunk #random-01}
+Cobalt lantern meadow, velvet compass, river stone.
+:::
+
+::: {.audio-chunk #random-02}
+Quiet orbit mango, silver window, paper thunder.
+:::
+
+::: {.audio-chunk #random-03}
+Amber circuit garden, walnut signal, distant piano.
+:::
+
+::: {.audio-chunk #random-04}
+Crimson marble cloud, winter kettle, copper horizon.
+:::
+
+::: {.audio-chunk #random-05}
+Hidden forest pixel, lemon rocket, gentle rainfall.
+:::
