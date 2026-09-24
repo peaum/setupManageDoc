@@ -25,11 +25,7 @@ SKLL-ENGMATH is a documentation and build project for embedded systems datasheet
 This manual explains how to install the project, create documents, render outputs, add HTML customizations, build audio, run tests, and troubleshoot common problems.
 
 ::: {.callout-note}
-Run project commands from the repository root:
-
-```text
-C:\Users\peace\Documents\TUS\Digital Communications\digcom
-```
+Run project commands from the repository root, meaning the directory that contains `_quarto.yml`.
 :::
 
 # Requirements
@@ -247,18 +243,15 @@ The HTML output is self-contained where possible because `embed-resources: true`
 
 # HTML Customization
 
-HTML-specific assets live in:
+The current HTML-specific asset is:
 
 ```text
 css/custom.css
-javascript/custom.js
 ```
 
-Edit `css/custom.css` to change colors, spacing, typography, tables, callouts, or other HTML presentation details. Edit `javascript/custom.js` to add browser behavior such as navigation helpers, interactive controls, or document instrumentation.
+Edit `css/custom.css` to change colors, spacing, typography, tables, callouts, or other HTML presentation details. Add a JavaScript asset only when browser behavior such as navigation helpers, interactive controls, or document instrumentation is needed, and update `_quarto.yml` to reference it.
 
-These assets are configured only for the HTML format. PDF and DOCX rendering do not execute the JavaScript or apply the HTML stylesheet.
-
-The current JavaScript adds the `skll-engmath-html` class to the document root. That class can be used as a scope for future styles:
+The stylesheet is configured only for the HTML format. PDF and DOCX rendering do not apply it. Scope future styles to the document when appropriate:
 
 ```css
 .skll-engmath-html .callout {
@@ -353,7 +346,7 @@ Run the focused audio test with:
 python -m pytest tests/test_audio_build.py -q
 ```
 
-The test uses a fake synthesizer and a temporary directory. It verifies extraction, chunk ordering, file naming, and output-directory behavior without requiring a voice model. The real audio test requires the Piper model and creates persistent MP3 files.
+The test uses a fake synthesizer and a temporary directory. It verifies extraction, chunk ordering, file naming, and output-directory behavior without requiring a voice model. A real audio build requires the Piper model and writes persistent MP3 files under the selected output directory.
 
 Run the complete test suite with:
 
